@@ -1,7 +1,7 @@
 # Личный проект «Кекстаграм» [![Build status][travis-image]][travis-url]
 
 * Студент: [Данила Хитёв](https://up.htmlacademy.ru/javascript/16/user/839243).
-* Наставник: `Неизвестно`.
+* Наставник: `Виталий Яковенко`.
 
 ---
 
