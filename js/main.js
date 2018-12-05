@@ -79,25 +79,33 @@ var createPostsArray = function () {
 
 
 //  Создание DOM элементов
-var createPostElement = function (posts) {
+var createPhotos = function (posts) {
   var similarPhotoTemplate = document.querySelector('#picture')
     .content
     .querySelector('.picture');
-  var postElement = similarPhotoTemplate.cloneNode(true);
 
-  postElement.querySelector('.picture__img').setAttribute('src', 'photos/' + posts.url + '.jpg');
-  postElement.querySelector('.picture__likes').textContent = posts.likes;
-  postElement.querySelector('.picture__comments').textContent = posts.comments.length;
+  var createPostElement = function (samePosts, template) {
+    var postElement = template.cloneNode(true);
 
-  return postElement;
-};
+    postElement.querySelector('.picture__img').setAttribute('src', 'photos/' + samePosts.url + '.jpg');
+    postElement.querySelector('.picture__likes').textContent = samePosts.likes;
+    postElement.querySelector('.picture__comments').textContent = samePosts.comments.length;
 
-var createElements = function (posts) {
-  var fragment = document.createDocumentFragment();
-  for (var i = 0; i < posts.length; i++) {
-    fragment.appendChild(createPostElement(posts[i]));
-  }
-  return fragment;
+    return postElement;
+  };
+
+  var createPostElements = function (samePosts) {
+    var fragment = document.createDocumentFragment();
+    for (var i = 0; i < samePosts.length; i++) {
+      fragment.appendChild(createPostElement(samePosts[i], similarPhotoTemplate));
+    }
+    return fragment;
+  };
+
+  var elements = createPostElements(posts);
+
+  var pictures = document.querySelector('.pictures');
+  pictures.appendChild(elements);
 };
 
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
@@ -150,14 +158,12 @@ var createBigPicture = function (post) {
 
 // ВЫЗОВЫ
 var posts = createPostsArray();
-var elements = createElements(posts);
+createPhotos(posts);
 createBigPicture(posts[0]);
 
 // Работа с DOM
-var pictures = document.querySelector('.pictures');
 var commentCount = document.querySelector('.social__comment-count');
 var commentLoader = document.querySelector('.comments-loader');
 
-pictures.appendChild(elements);
 commentCount.classList.add('visually-hidden');
 commentLoader.classList.add('visually-hidden');
