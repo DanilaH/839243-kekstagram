@@ -120,7 +120,7 @@ var createBigPicture = function (posts) {
 
   //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
 
-  var createComment = function (post) {
+  var createCommentElement = function (post) {
     var commentTemplate = document.querySelector('#social__comment')
       .content
       .querySelector('.social__comment');
@@ -130,21 +130,21 @@ var createBigPicture = function (posts) {
     commentElement.querySelector('.social__text').textContent = post.message;
 
     return commentElement;
-  }
+  };
 
-  var createComments = function () {
+  var createCommentElements = function () {
     var fragment = document.createDocumentFragment();
     for (var i = 0; i < firstPost.comments.length; i++) {
-      fragment.appendChild(createComment(firstPost.comments[i]));
+      fragment.appendChild(createCommentElement(firstPost.comments[i]));
     }
     return fragment;
   };
 
   // Вызов отрисовывающе-добавляющей функии
-  var elements = createComments();
+  var elements = createCommentElements();
 
   var commentsList = document.querySelector('.social__comments');
-  commentsList.appendChild(elements)
+  commentsList.appendChild(elements);
 
   return bigPicture;
 };
