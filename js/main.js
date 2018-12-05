@@ -20,10 +20,10 @@ var getRandomFromArray = function (array) {
 
 // Неповторяющееся случайное значение
 var getKindOfRandomFromArray = function (array) {
-  var random = array[Math.floor(Math.random() * array.length)];
+  var random = getRandomFromArray(array);
   //  Нахождение индекса выпавшего элемента
   var index = array.indexOf(random);
-  //  Удаление этого индекса из массива, дабы он при следующем рандоме не выпалы
+  //  Удаление этого индекса из массива, дабы он при следующем рандоме не выпал
   array.splice(index, 1);
   return random;
 };
@@ -80,6 +80,9 @@ var createPostsArray = function () {
 
 //  Создание DOM элементов
 var createPostElement = function (posts) {
+  var similarPhotoTemplate = document.querySelector('#picture')
+    .content
+    .querySelector('.picture');
   var postElement = similarPhotoTemplate.cloneNode(true);
 
   postElement.querySelector('.picture__img').setAttribute('src', 'photos/' + posts.url + '.jpg');
@@ -100,7 +103,9 @@ var createElements = function (posts) {
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
 var createBigPicture = function (posts) {
   // Информация из первого сгенерированного поста
-  var firstPost = posts[0];
+  var bigPicture = document.querySelector('.big-picture');
+  bigPicture.classList.remove('hidden');
+  var firstPost = posts;
 
   bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + firstPost.url + '.jpg');
   bigPicture.querySelector('.likes-count').textContent = firstPost.likes;
@@ -115,40 +120,31 @@ var createBigPicture = function (posts) {
 
   //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
 
-  // Функция для создания разметки комментариев
-  var makeElement = function (tagName, className) {
-    var bigPictureComments = document.createElement(tagName);
-    bigPictureComments.classList.add(className);
+  var createComment = function (post) {
+    var commentTemplate = document.querySelector('#social__comment')
+      .content
+      .querySelector('.social__comment');
+    var commentElement = commentTemplate.cloneNode(true);
 
-    return bigPictureComments;
-  };
+    commentElement.querySelector('.social__picture').setAttribute('src', post.avatar);
+    commentElement.querySelector('.social__text').textContent = post.message;
 
-  //  Функция, создающая эту самую разметку
-  var makeElements = function (array) {
-    var listItem = makeElement('li', 'social__comment');
+    return commentElement;
+  }
 
-    var commentAvatar = makeElement('img', 'social__picture');
-    commentAvatar.alt = 'Аватар комментатора фотографии';
-    commentAvatar.src = array.avatar;
-    listItem.appendChild(commentAvatar);
-
-    var commentText = makeElement('p', 'social__text');
-    commentText.textContent = array.message;
-    listItem.appendChild(commentText);
-
-    return listItem;
-  };
-
-  //  Функция отрисовывающе-добавляющая
-  var displayElements = function () {
+  var createComments = function () {
+    var fragment = document.createDocumentFragment();
     for (var i = 0; i < firstPost.comments.length; i++) {
-      var item = makeElements(firstPost.comments[i]);
-      commentsList.appendChild(item);
+      fragment.appendChild(createComment(firstPost.comments[i]));
     }
+    return fragment;
   };
 
   // Вызов отрисовывающе-добавляющей функии
-  displayElements();
+  var elements = createComments();
+
+  var commentsList = document.querySelector('.social__comments');
+  commentsList.appendChild(elements)
 
   return bigPicture;
 };
@@ -156,19 +152,13 @@ var createBigPicture = function (posts) {
 // ВЫЗОВЫ
 var posts = createPostsArray();
 var elements = createElements(posts);
-createBigPicture(posts);
+createBigPicture(posts[0]);
 
 // Работа с DOM
 var pictures = document.querySelector('.pictures');
-var similarPhotoTemplate = document.querySelector('#picture')
-    .content
-    .querySelector('.picture');
-var bigPicture = document.querySelector('.big-picture');
-var commentsList = document.querySelector('.social__comments');
 var commentCount = document.querySelector('.social__comment-count');
 var commentLoader = document.querySelector('.comments-loader');
 
 pictures.appendChild(elements);
-bigPicture.classList.remove('hidden');
 commentCount.classList.add('visually-hidden');
 commentLoader.classList.add('visually-hidden');
