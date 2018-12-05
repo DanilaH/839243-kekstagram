@@ -101,14 +101,13 @@ var createElements = function (posts) {
 };
 
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
-var createBigPicture = function (posts) {
+var createBigPicture = function (post) {
   // Информация из первого сгенерированного поста
   var bigPicture = document.querySelector('.big-picture');
   bigPicture.classList.remove('hidden');
-  var firstPost = posts;
 
-  bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + firstPost.url + '.jpg');
-  bigPicture.querySelector('.likes-count').textContent = firstPost.likes;
+  bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
+  bigPicture.querySelector('.likes-count').textContent = post.likes;
   bigPicture.querySelector('.social__caption').textContent = 'Бла-бла-бла, описание фотографии';
 
   /*
@@ -119,12 +118,12 @@ var createBigPicture = function (posts) {
   */
 
   //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
-
-  var createCommentElement = function (post) {
-    var commentTemplate = document.querySelector('#social__comment')
+  var commentTemplate = document.querySelector('#social__comment')
       .content
       .querySelector('.social__comment');
-    var commentElement = commentTemplate.cloneNode(true);
+
+  var createCommentElement = function (post, template) {
+    var commentElement = template.cloneNode(true);
 
     commentElement.querySelector('.social__picture').setAttribute('src', post.avatar);
     commentElement.querySelector('.social__text').textContent = post.message;
@@ -134,8 +133,8 @@ var createBigPicture = function (posts) {
 
   var createCommentElements = function () {
     var fragment = document.createDocumentFragment();
-    for (var i = 0; i < firstPost.comments.length; i++) {
-      fragment.appendChild(createCommentElement(firstPost.comments[i]));
+    for (var i = 0; i < post.comments.length; i++) {
+      fragment.appendChild(createCommentElement(post.comments[i], commentTemplate));
     }
     return fragment;
   };
