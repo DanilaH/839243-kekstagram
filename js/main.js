@@ -122,11 +122,11 @@ var createBigPicture = function (post) {
       .content
       .querySelector('.social__comment');
 
-  var createCommentElement = function (post, template) {
+  var createCommentElement = function (samePost, template) {
     var commentElement = template.cloneNode(true);
 
-    commentElement.querySelector('.social__picture').setAttribute('src', post.avatar);
-    commentElement.querySelector('.social__text').textContent = post.message;
+    commentElement.querySelector('.social__picture').setAttribute('src', samePost.avatar);
+    commentElement.querySelector('.social__text').textContent = samePost.message;
 
     return commentElement;
   };
