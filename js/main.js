@@ -10,6 +10,7 @@ var MAX_AVATAR = 6;
 var MIN_COMMENTS_LENGTH = 2;
 var MAX_COMMENTS_LENGTH = 10;
 var TOTAL_OBJECTS = 25;
+var ESC_KEYCODE = 27;
 
 //  Случайное значение из массива
 var getRandomFromArray = function (array) {
@@ -156,10 +157,123 @@ var createBigPicture = function (post) {
   return bigPicture;
 };
 
+// ***********************************
+// ОБРАБОТЧИКИ СОБЫТИЙ
+// ***********************************
+
+// Удаление или добавка класса hidden при загрузке изображения
+var uploadFile = document.querySelector('#upload-file');
+var userImageUpload = document.querySelector('.img-upload__overlay');
+var uploadCancel = userImageUpload.querySelector('#upload-cancel');
+var mainImage = userImageUpload.querySelector('.img-upload__preview img');
+
+var openPopup = function (element) {
+  element.classList.remove('hidden');
+  document.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      element.classList.add('hidden');
+    }
+  });
+};
+
+var closePopup = function (element) {
+  element.classList.add('hidden');
+  document.removeEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      element.classList.add('hidden');
+    }
+  });
+};
+
+uploadFile.addEventListener('change', function () {
+  openPopup(userImageUpload);
+  userImageUpload.querySelector('.effect-level').classList.add('hidden');
+});
+
+uploadCancel.addEventListener('click', function () {
+  closePopup(userImageUpload);
+});
+
+// ЗАГРУЗКА СВОЕГО ИЗОБРАЖЕНИЯ
+uploadFile.addEventListener('change', function (event) {
+  var selectedFile = event.target.files[0];
+  var reader = new FileReader();
+
+  var img = mainImage;
+  img.title = selectedFile.name;
+
+  reader.onload = function (evt) {
+    img.src = evt.target.result;
+  };
+
+  reader.readAsDataURL(selectedFile);
+});
+
+
+// ДОБАВЛЕНИЕ ЭФФЕКТОВ НА ИЗОБРАЖЕНИЕ
+var addOnlyOneClassToImage = function (classString) {
+  var image = mainImage;
+  var classes = image.classList;
+
+  for (var i = 1; i <= classes.length; i++) {
+    classes.remove(classes[0]);
+  }
+
+  classes.add(classString);
+};
+
+// оригинал
+var original = userImageUpload.querySelector('#effect-none');
+original.addEventListener('click', function () {
+  addOnlyOneClassToImage();
+  userImageUpload.querySelector('.effect-level').classList.add('hidden');
+});
+
+// Функция для разных эффектов
+var addOtherEffect = function (effect) {
+  var effectClass = 'effects__preview--' + effect;
+  var effectId = '#effect-' + effect;
+  var effectName = userImageUpload.querySelector(effectId);
+  effectName.addEventListener('click', function () {
+    addOnlyOneClassToImage(effectClass);
+    userImageUpload.querySelector('.effect-level').classList.remove('hidden');
+  });
+};
+// разные фильтры
+addOtherEffect('chrome');
+addOtherEffect('sepia');
+addOtherEffect('marvin');
+addOtherEffect('phobos');
+addOtherEffect('heat');
+
+// Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
+var pictureList = document.querySelector('.pictures');
+var bigPicture = document.querySelector('.big-picture');
+
+pictureList.addEventListener('click', function (event) {
+  var pictureItems = pictureList.querySelectorAll('.picture');
+  var picturesArray = Array.from(pictureItems);
+  var target = event.target;
+
+  while (target !== pictureList) {
+    if (target.tagName === 'A') {
+      var index = picturesArray.indexOf(target);
+      createBigPicture(posts[index]);
+      openPopup(bigPicture);
+      return;
+    }
+    target = target.parentNode;
+  }
+});
+
+var bigPictureClose = document.querySelector('.big-picture__cancel');
+bigPictureClose.addEventListener('click', function () {
+  closePopup(bigPicture);
+});
+
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
-createBigPicture(posts[0]);
 
 // Работа с DOM
 var commentCount = document.querySelector('.social__comment-count');
