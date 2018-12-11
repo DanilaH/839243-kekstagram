@@ -167,22 +167,25 @@ var userImageUpload = document.querySelector('.img-upload__overlay');
 var uploadCancel = userImageUpload.querySelector('#upload-cancel');
 var mainImage = userImageUpload.querySelector('.img-upload__preview img');
 
+var onPopupEscPress = function (evt) {
+  var closeElement = document.querySelector('.opened-popup');
+  if (evt.keyCode === ESC_KEYCODE) {
+    closeElement.classList.add('hidden');
+    closeElement.classList.remove('opened-popup');
+  }
+
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
 var openPopup = function (element) {
+  element.classList.add('opened-popup');
   element.classList.remove('hidden');
-  document.addEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      element.classList.add('hidden');
-    }
-  });
+  document.addEventListener('keydown', onPopupEscPress);
 };
 
 var closePopup = function (element) {
   element.classList.add('hidden');
-  document.removeEventListener('keydown', function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      element.classList.add('hidden');
-    }
-  });
+  document.removeEventListener('keydown', onPopupEscPress);
 };
 
 uploadFile.addEventListener('change', function () {
