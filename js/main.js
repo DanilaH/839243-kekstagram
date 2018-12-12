@@ -78,7 +78,6 @@ var createPostsArray = function () {
   return posts;
 };
 
-
 //  Создание DOM элементов
 var createPhotos = function (posts) {
   var similarPhotoTemplate = document.querySelector('#picture')
@@ -119,13 +118,6 @@ var createBigPicture = function (post) {
   bigPicture.querySelector('.likes-count').textContent = post.likes;
   bigPicture.querySelector('.social__caption').textContent = 'Бла-бла-бла, описание фотографии';
 
-  /*
-
-    Я не стал делить следующие функции на отдельные кусочки вне вот этой.
-    Мне думается, что раз оно всё в одном контексте, то можно и так (ИЛИ НЕ НАДО?)
-
-  */
-
   //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
   var commentTemplate = document.querySelector('#social__comment')
       .content
@@ -161,12 +153,6 @@ var createBigPicture = function (post) {
 // ОБРАБОТЧИКИ СОБЫТИЙ
 // ***********************************
 
-// Удаление или добавка класса hidden при загрузке изображения
-var uploadFile = document.querySelector('#upload-file');
-var userImageUpload = document.querySelector('.img-upload__overlay');
-var uploadCancel = userImageUpload.querySelector('#upload-cancel');
-var mainImage = userImageUpload.querySelector('.img-upload__preview img');
-
 var onPopupEscPress = function (evt) {
   var closeElement = document.querySelector('.opened-popup');
   if (evt.keyCode === ESC_KEYCODE) {
@@ -188,66 +174,77 @@ var closePopup = function (element) {
   document.removeEventListener('keydown', onPopupEscPress);
 };
 
-uploadFile.addEventListener('change', function () {
-  openPopup(userImageUpload);
-  userImageUpload.querySelector('.effect-level').classList.add('hidden');
-});
 
-uploadCancel.addEventListener('click', function () {
-  closePopup(userImageUpload);
-});
+var uploadPicture = function () {
 
-// ЗАГРУЗКА СВОЕГО ИЗОБРАЖЕНИЯ
-uploadFile.addEventListener('change', function (event) {
-  var selectedFile = event.target.files[0];
-  var reader = new FileReader();
+  // Генерация шаблона
+  var pictureTemplate = document.querySelector('#img-upload__overlay')
+      .content
+      .querySelector('.img-upload__overlay');
 
-  var img = mainImage;
-  img.title = selectedFile.name;
+  var createPictureFragment = function () {
+    var fragment = document.createDocumentFragment();
+    fragment.appendChild(pictureTemplate);
 
-  reader.onload = function (evt) {
-    img.src = evt.target.result;
+    return fragment;
   };
 
-  reader.readAsDataURL(selectedFile);
-});
+  var fragment = createPictureFragment();
+  var imageUploadStart = document.querySelector('.img-upload');
+  imageUploadStart.appendChild(fragment);
+
+  var mainImage = imageUploadStart.querySelector('.img-upload__preview img');
+  var effectsContainer = imageUploadStart.querySelector('.effects');
+  imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+
+  // ДОБАВЛЕНИЕ ЭФФЕКТОВ НА ИЗОБРАЖЕНИЕ
+  var addOnlyOneClassToImage = function (classString) {
+    var image = mainImage;
+    var classes = image.classList;
+
+    for (var i = 1; i <= classes.length; i++) {
+      classes.remove(classes[0]);
+    }
+
+    classes.add(classString);
+  };
+
+  // оригинал
+  var original = effectsContainer.querySelector('#effect-none');
+  original.addEventListener('click', function () {
+    addOnlyOneClassToImage();
+    imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+  });
+
+  // Функция для разных эффектов
+  var addOtherEffect = function (effect) {
+    var effectClass = 'effects__preview--' + effect;
+    var effectId = '#effect-' + effect;
+    var effectName = effectsContainer.querySelector(effectId);
+    effectName.addEventListener('click', function () {
+      addOnlyOneClassToImage(effectClass);
+      imageUploadStart.querySelector('.effect-level').classList.remove('hidden');
+    });
+  };
+
+  // разные фильтры
+  addOtherEffect('chrome');
+  addOtherEffect('sepia');
+  addOtherEffect('marvin');
+  addOtherEffect('phobos');
+  addOtherEffect('heat');
+
+  // Закрыть-открыть
+  var uploadImageOverlay = imageUploadStart.querySelector('.img-upload__overlay');
+  openPopup(uploadImageOverlay);
 
 
-// ДОБАВЛЕНИЕ ЭФФЕКТОВ НА ИЗОБРАЖЕНИЕ
-var addOnlyOneClassToImage = function (classString) {
-  var image = mainImage;
-  var classes = image.classList;
-
-  for (var i = 1; i <= classes.length; i++) {
-    classes.remove(classes[0]);
-  }
-
-  classes.add(classString);
-};
-
-// оригинал
-var original = userImageUpload.querySelector('#effect-none');
-original.addEventListener('click', function () {
-  addOnlyOneClassToImage();
-  userImageUpload.querySelector('.effect-level').classList.add('hidden');
-});
-
-// Функция для разных эффектов
-var addOtherEffect = function (effect) {
-  var effectClass = 'effects__preview--' + effect;
-  var effectId = '#effect-' + effect;
-  var effectName = userImageUpload.querySelector(effectId);
-  effectName.addEventListener('click', function () {
-    addOnlyOneClassToImage(effectClass);
-    userImageUpload.querySelector('.effect-level').classList.remove('hidden');
+  var uploadCancel = imageUploadStart.querySelector('#upload-cancel');
+  uploadCancel.addEventListener('click', function () {
+    closePopup(uploadImageOverlay);
+    uploadImageOverlay.remove();
   });
 };
-// разные фильтры
-addOtherEffect('chrome');
-addOtherEffect('sepia');
-addOtherEffect('marvin');
-addOtherEffect('phobos');
-addOtherEffect('heat');
 
 // Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
 var pictureList = document.querySelector('.pictures');
@@ -277,6 +274,9 @@ bigPictureClose.addEventListener('click', function () {
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
+
+var uploadFile = document.querySelector('#upload-file');
+uploadFile.addEventListener('change', uploadPicture);
 
 // Работа с DOM
 var commentCount = document.querySelector('.social__comment-count');
