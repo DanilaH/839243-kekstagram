@@ -108,11 +108,37 @@ var createPhotos = function (posts) {
   pictures.appendChild(elements);
 };
 
+// Функция, закрывающая шаблоны
+var closeTemplate = function (template) {
+  var onEscPress = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      template.remove();
+      document.removeEventListener('keydown', onEscPress);
+    }
+  };
+
+  document.addEventListener('keydown', onEscPress);
+
+  template.querySelector('.cancel').addEventListener('click', function (evt) {
+    evt.stopPropagation();
+
+    template.remove();
+    document.removeEventListener('keydown', onEscPress);
+  });
+};
+
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
 var createBigPicture = function (post) {
   // Информация из первого сгенерированного поста
-  var bigPicture = document.querySelector('.big-picture');
-  bigPicture.classList.remove('hidden');
+  var bigPicture = document.querySelector('#big-picture')
+      .content
+      .cloneNode(true)
+      .querySelector('.big-picture');
+
+  var main = document.querySelector('#main');
+  main.appendChild(bigPicture);
+
+  closeTemplate(bigPicture);
 
   bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
   bigPicture.querySelector('.likes-count').textContent = post.likes;
@@ -146,52 +172,26 @@ var createBigPicture = function (post) {
   var commentsList = document.querySelector('.social__comments');
   commentsList.appendChild(elements);
 
-  return bigPicture;
+  var commentCount = bigPicture.querySelector('.social__comment-count');
+  var commentLoader = bigPicture.querySelector('.comments-loader');
+
+  commentCount.classList.add('visually-hidden');
+  commentLoader.classList.add('visually-hidden');
 };
 
-// ***********************************
-// ОБРАБОТЧИКИ СОБЫТИЙ
-// ***********************************
-
-var onPopupEscPress = function (evt) {
-  var closeElement = document.querySelector('.opened-popup');
-  if (evt.keyCode === ESC_KEYCODE) {
-    closeElement.classList.add('hidden');
-    closeElement.classList.remove('opened-popup');
-  }
-
-  document.removeEventListener('keydown', onPopupEscPress);
-};
-
-var openPopup = function (element) {
-  element.classList.add('opened-popup');
-  element.classList.remove('hidden');
-  document.addEventListener('keydown', onPopupEscPress);
-};
-
-var closePopup = function (element) {
-  element.classList.add('hidden');
-  document.removeEventListener('keydown', onPopupEscPress);
-};
-
-
+//  Загружаемая картинка
 var uploadPicture = function () {
-
   // Генерация шаблона
   var pictureTemplate = document.querySelector('#img-upload__overlay')
       .content
+      .cloneNode(true)
       .querySelector('.img-upload__overlay');
 
-  var createPictureFragment = function () {
-    var fragment = document.createDocumentFragment();
-    fragment.appendChild(pictureTemplate);
-
-    return fragment;
-  };
-
-  var fragment = createPictureFragment();
+  // вставляем элемент в дом
   var imageUploadStart = document.querySelector('.img-upload');
-  imageUploadStart.appendChild(fragment);
+  imageUploadStart.appendChild(pictureTemplate);
+
+  closeTemplate(pictureTemplate);
 
   var mainImage = imageUploadStart.querySelector('.img-upload__preview img');
   var effectsContainer = imageUploadStart.querySelector('.effects');
@@ -233,54 +233,32 @@ var uploadPicture = function () {
   addOtherEffect('marvin');
   addOtherEffect('phobos');
   addOtherEffect('heat');
-
-  // Закрыть-открыть
-  var uploadImageOverlay = imageUploadStart.querySelector('.img-upload__overlay');
-  openPopup(uploadImageOverlay);
-
-
-  var uploadCancel = imageUploadStart.querySelector('#upload-cancel');
-  uploadCancel.addEventListener('click', function () {
-    closePopup(uploadImageOverlay);
-    uploadImageOverlay.remove();
-  });
 };
 
 // Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
 var pictureList = document.querySelector('.pictures');
-var bigPicture = document.querySelector('.big-picture');
 
-pictureList.addEventListener('click', function (event) {
+pictureList.addEventListener('click', function (evt) {
   var pictureItems = pictureList.querySelectorAll('.picture');
   var picturesArray = Array.from(pictureItems);
-  var target = event.target;
+  var target = evt.target;
 
   while (target !== pictureList) {
     if (target.tagName === 'A') {
       var index = picturesArray.indexOf(target);
       createBigPicture(posts[index]);
-      openPopup(bigPicture);
       return;
     }
     target = target.parentNode;
   }
 });
 
-var bigPictureClose = document.querySelector('.big-picture__cancel');
-bigPictureClose.addEventListener('click', function () {
-  closePopup(bigPicture);
+var uploadFile = document.querySelector('#upload-file');
+uploadFile.addEventListener('change', function (evt) {
+  evt.preventDefault();
+  uploadPicture();
 });
 
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
-
-var uploadFile = document.querySelector('#upload-file');
-uploadFile.addEventListener('change', uploadPicture);
-
-// Работа с DOM
-var commentCount = document.querySelector('.social__comment-count');
-var commentLoader = document.querySelector('.comments-loader');
-
-commentCount.classList.add('visually-hidden');
-commentLoader.classList.add('visually-hidden');
