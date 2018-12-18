@@ -10,6 +10,7 @@ var MAX_AVATAR = 6;
 var MIN_COMMENTS_LENGTH = 2;
 var MAX_COMMENTS_LENGTH = 10;
 var TOTAL_OBJECTS = 25;
+var ESC_KEYCODE = 27;
 
 //  Случайное значение из массива
 var getRandomFromArray = function (array) {
@@ -77,7 +78,6 @@ var createPostsArray = function () {
   return posts;
 };
 
-
 //  Создание DOM элементов
 var createPhotos = function (posts) {
   var similarPhotoTemplate = document.querySelector('#picture')
@@ -108,22 +108,41 @@ var createPhotos = function (posts) {
   pictures.appendChild(elements);
 };
 
+// Функция, закрывающая шаблоны
+var closeTemplate = function (template) {
+  var onEscPress = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      template.remove();
+      document.removeEventListener('keydown', onEscPress);
+    }
+  };
+
+  document.addEventListener('keydown', onEscPress);
+
+  template.querySelector('.cancel').addEventListener('click', function (evt) {
+    evt.stopPropagation();
+
+    template.remove();
+    document.removeEventListener('keydown', onEscPress);
+  });
+};
+
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
 var createBigPicture = function (post) {
   // Информация из первого сгенерированного поста
-  var bigPicture = document.querySelector('.big-picture');
-  bigPicture.classList.remove('hidden');
+  var bigPicture = document.querySelector('#big-picture')
+      .content
+      .cloneNode(true)
+      .querySelector('.big-picture');
+
+  var main = document.querySelector('#main');
+  main.appendChild(bigPicture);
+
+  closeTemplate(bigPicture);
 
   bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
   bigPicture.querySelector('.likes-count').textContent = post.likes;
   bigPicture.querySelector('.social__caption').textContent = 'Бла-бла-бла, описание фотографии';
-
-  /*
-
-    Я не стал делить следующие функции на отдельные кусочки вне вот этой.
-    Мне думается, что раз оно всё в одном контексте, то можно и так (ИЛИ НЕ НАДО?)
-
-  */
 
   //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
   var commentTemplate = document.querySelector('#social__comment')
@@ -153,17 +172,111 @@ var createBigPicture = function (post) {
   var commentsList = document.querySelector('.social__comments');
   commentsList.appendChild(elements);
 
-  return bigPicture;
+  var commentCount = bigPicture.querySelector('.social__comment-count');
+  var commentLoader = bigPicture.querySelector('.comments-loader');
+
+  commentCount.classList.add('visually-hidden');
+  commentLoader.classList.add('visually-hidden');
 };
+
+//  Загружаемая картинка
+var uploadPicture = function () {
+  // Генерация шаблона
+  var pictureTemplate = document.querySelector('#img-upload__overlay')
+      .content
+      .cloneNode(true)
+      .querySelector('.img-upload__overlay');
+
+  // вставляем элемент в дом
+  var imageUploadStart = document.querySelector('.img-upload');
+  imageUploadStart.appendChild(pictureTemplate);
+
+  //  Сброс значения кнопки загрузки фото
+  var resetFileButton = function () {
+    var onEscPress = function (evt) {
+      if (evt.keyCode === ESC_KEYCODE) {
+        document.getElementById('upload-file').value = '';
+        document.removeEventListener('keydown', onEscPress);
+      }
+    };
+
+    document.addEventListener('keydown', onEscPress);
+
+    pictureTemplate.querySelector('.cancel').addEventListener('click', function () {
+      document.getElementById('upload-file').value = '';
+      document.removeEventListener('keydown', onEscPress);
+    });
+  };
+
+  // Работа с эффектами
+  var mainImage = imageUploadStart.querySelector('.img-upload__preview img');
+  var effectsContainer = imageUploadStart.querySelector('.effects');
+  imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+
+  var addOnlyOneClassToImage = function (classString) {
+    var image = mainImage;
+    var classes = image.classList;
+
+    for (var i = 1; i <= classes.length; i++) {
+      classes.remove(classes[0]);
+    }
+
+    classes.add(classString);
+  };
+
+  // оригинал
+  var original = effectsContainer.querySelector('#effect-none');
+  original.addEventListener('click', function () {
+    addOnlyOneClassToImage();
+    imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+  });
+
+  // Функция для разных эффектов
+  var addOtherEffect = function (effect) {
+    var effectClass = 'effects__preview--' + effect;
+    var effectId = '#effect-' + effect;
+    var effectName = effectsContainer.querySelector(effectId);
+    effectName.addEventListener('click', function () {
+      addOnlyOneClassToImage(effectClass);
+      imageUploadStart.querySelector('.effect-level').classList.remove('hidden');
+    });
+  };
+
+  // разные фильтры
+  addOtherEffect('chrome');
+  addOtherEffect('sepia');
+  addOtherEffect('marvin');
+  addOtherEffect('phobos');
+  addOtherEffect('heat');
+
+  closeTemplate(pictureTemplate);
+  resetFileButton();
+};
+
+// Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
+var pictureList = document.querySelector('.pictures');
+
+pictureList.addEventListener('click', function (evt) {
+  var pictureItems = pictureList.querySelectorAll('.picture');
+  var picturesArray = Array.from(pictureItems);
+  var target = evt.target;
+
+  while (target !== pictureList) {
+    if (target.tagName === 'A') {
+      var index = picturesArray.indexOf(target);
+      createBigPicture(posts[index]);
+      return;
+    }
+    target = target.parentNode;
+  }
+});
+
+var uploadFile = document.querySelector('#upload-file');
+uploadFile.addEventListener('change', function (evt) {
+  evt.preventDefault();
+  uploadPicture();
+});
 
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
-createBigPicture(posts[0]);
-
-// Работа с DOM
-var commentCount = document.querySelector('.social__comment-count');
-var commentLoader = document.querySelector('.comments-loader');
-
-commentCount.classList.add('visually-hidden');
-commentLoader.classList.add('visually-hidden');
