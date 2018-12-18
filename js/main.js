@@ -191,13 +191,28 @@ var uploadPicture = function () {
   var imageUploadStart = document.querySelector('.img-upload');
   imageUploadStart.appendChild(pictureTemplate);
 
-  closeTemplate(pictureTemplate);
+  //  Сброс значения кнопки загрузки фото
+  var resetFileButton = function () {
+    var onEscPress = function (evt) {
+      if (evt.keyCode === ESC_KEYCODE) {
+        document.getElementById('upload-file').value = '';
+        document.removeEventListener('keydown', onEscPress);
+      }
+    };
 
+    document.addEventListener('keydown', onEscPress);
+
+    pictureTemplate.querySelector('.cancel').addEventListener('click', function () {
+      document.getElementById('upload-file').value = '';
+      document.removeEventListener('keydown', onEscPress);
+    });
+  };
+
+  // Работа с эффектами
   var mainImage = imageUploadStart.querySelector('.img-upload__preview img');
   var effectsContainer = imageUploadStart.querySelector('.effects');
   imageUploadStart.querySelector('.effect-level').classList.add('hidden');
 
-  // ДОБАВЛЕНИЕ ЭФФЕКТОВ НА ИЗОБРАЖЕНИЕ
   var addOnlyOneClassToImage = function (classString) {
     var image = mainImage;
     var classes = image.classList;
@@ -233,6 +248,9 @@ var uploadPicture = function () {
   addOtherEffect('marvin');
   addOtherEffect('phobos');
   addOtherEffect('heat');
+
+  closeTemplate(pictureTemplate);
+  resetFileButton();
 };
 
 // Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
