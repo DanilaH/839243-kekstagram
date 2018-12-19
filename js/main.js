@@ -273,7 +273,9 @@ var uploadPicture = function () {
 
     // Проверка хэштэгов
     for (var i = 0; i < totalHashtags.length; i++) {
-      if (totalHashtags[i] === '#') {
+      if (totalHashtags[i] === '') {
+        hashtagInput.setCustomValidity('');
+      } else if (totalHashtags[i] === '#') {
         hashtagInput.setCustomValidity('Хэштэг не может состоять из одной решётки');
         return;
       } else if (totalHashtags[i].length > 20) {
