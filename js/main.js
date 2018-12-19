@@ -188,8 +188,8 @@ var uploadPicture = function () {
       .querySelector('.img-upload__overlay');
 
   // вставляем элемент в дом
-  var imageUploadStart = document.querySelector('.img-upload');
-  imageUploadStart.appendChild(pictureTemplate);
+  var imageUploadForm = document.querySelector('.img-upload__form');
+  imageUploadForm.appendChild(pictureTemplate);
 
   //  Сброс значения кнопки загрузки фото
   var resetFileButton = function () {
@@ -209,9 +209,9 @@ var uploadPicture = function () {
   };
 
   // Работа с эффектами
-  var mainImage = imageUploadStart.querySelector('.img-upload__preview img');
-  var effectsContainer = imageUploadStart.querySelector('.effects');
-  imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+  var mainImage = imageUploadForm.querySelector('.img-upload__preview img');
+  var effectsContainer = imageUploadForm.querySelector('.effects');
+  imageUploadForm.querySelector('.effect-level').classList.add('hidden');
 
   var addOnlyOneClassToImage = function (classString) {
     var image = mainImage;
@@ -228,7 +228,7 @@ var uploadPicture = function () {
   var original = effectsContainer.querySelector('#effect-none');
   original.addEventListener('click', function () {
     addOnlyOneClassToImage();
-    imageUploadStart.querySelector('.effect-level').classList.add('hidden');
+    imageUploadForm.querySelector('.effect-level').classList.add('hidden');
   });
 
   // Функция для разных эффектов
@@ -238,9 +238,56 @@ var uploadPicture = function () {
     var effectName = effectsContainer.querySelector(effectId);
     effectName.addEventListener('click', function () {
       addOnlyOneClassToImage(effectClass);
-      imageUploadStart.querySelector('.effect-level').classList.remove('hidden');
+      imageUploadForm.querySelector('.effect-level').classList.remove('hidden');
     });
   };
+
+  var formSubmitButton = imageUploadForm.querySelector('#upload-submit');
+
+  formSubmitButton.addEventListener('click', function () {
+
+    var hashtagInput = imageUploadForm.querySelector('.text__hashtags');
+    var totalHashtags = hashtagInput.value.split(' ');
+
+    if (totalHashtags.length > 5) {
+      hashtagInput.setCustomValidity('Нужно уменьшить количество хэштэгов, хотя бы до пяти');
+      return;
+    }
+
+    // Проверка на повторяющиеся хэштеги
+    for (var j = 0; j < totalHashtags.length; j++) {
+
+      for (var m = 0; m < totalHashtags.length; m++) {
+
+        if (j === m) {
+          continue;
+        }
+
+        if (totalHashtags[j] === totalHashtags[m]) {
+          hashtagInput.setCustomValidity('Не должно быть повторяющихся хэштэгов');
+          return;
+        }
+
+      }
+    }
+
+    // Проверка хэштэгов
+    for (var i = 0; i < totalHashtags.length; i++) {
+      if (totalHashtags[i] === '#') {
+        hashtagInput.setCustomValidity('Хэштэг не может состоять из одной решётки');
+        return;
+      } else if (totalHashtags[i].length > 20) {
+        hashtagInput.setCustomValidity('Хэштэг не может состоять больше, чем из 20 символов');
+        return;
+      } else if (totalHashtags[i].charAt(0) !== '#') {
+        hashtagInput.setCustomValidity('Хэштэг должен начинаться с решётки');
+        return;
+      }
+    }
+
+    hashtagInput.setCustomValidity('');
+
+  });
 
   // разные фильтры
   addOtherEffect('chrome');
@@ -252,6 +299,7 @@ var uploadPicture = function () {
   closeTemplate(pictureTemplate);
   resetFileButton();
 };
+
 
 // Открытие изображения, как "БОЛЬШОЙ КАРТИНКИ" через делегирование
 var pictureList = document.querySelector('.pictures');
