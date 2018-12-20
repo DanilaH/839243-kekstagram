@@ -153,7 +153,7 @@ var createBigPicture = function (post) {
   });
 
   bigPicture.querySelector('.cancel').addEventListener('click', function (evt) {
-    evt.stopPropagation();
+    evt.preventDefault();
 
     bigPicture.remove();
   });
@@ -269,7 +269,7 @@ var uploadPicture = function () {
   // Закрытие попапа
   var onEscPress = function (evt) {
     if (evt.keyCode === ESC_KEYCODE) {
-      document.getElementById('upload-file').value = '';
+      document.querySelector('#upload-file').value = '';
       pictureTemplate.remove();
     }
   };
@@ -277,9 +277,9 @@ var uploadPicture = function () {
   pictureTemplate.addEventListener('keydown', onEscPress);
 
   pictureTemplate.querySelector('.cancel').addEventListener('click', function (evt) {
-    evt.stopPropagation();
+    evt.preventDefault();
 
-    document.getElementById('upload-file').value = '';
+    document.querySelector('#upload-file').value = '';
 
     pictureTemplate.remove();
   });
