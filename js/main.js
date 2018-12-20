@@ -108,25 +108,6 @@ var createPhotos = function (posts) {
   pictures.appendChild(elements);
 };
 
-// Функция, закрывающая шаблоны
-var closeTemplate = function (template) {
-  var onEscPress = function (evt) {
-    if (evt.keyCode === ESC_KEYCODE) {
-      template.remove();
-      document.removeEventListener('keydown', onEscPress);
-    }
-  };
-
-  document.addEventListener('keydown', onEscPress);
-
-  template.querySelector('.cancel').addEventListener('click', function (evt) {
-    evt.stopPropagation();
-
-    template.remove();
-    document.removeEventListener('keydown', onEscPress);
-  });
-};
-
 //  ВЫВОД "БОЛЬШОЙ КАРТИНКИ"
 var createBigPicture = function (post) {
   // Информация из первого сгенерированного поста
@@ -137,8 +118,6 @@ var createBigPicture = function (post) {
 
   var main = document.querySelector('#main');
   main.appendChild(bigPicture);
-
-  closeTemplate(bigPicture);
 
   bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
   bigPicture.querySelector('.likes-count').textContent = post.likes;
@@ -166,6 +145,19 @@ var createBigPicture = function (post) {
     return fragment;
   };
 
+  // Закрытие попапа
+  bigPicture.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      bigPicture.remove();
+    }
+  });
+
+  bigPicture.querySelector('.cancel').addEventListener('click', function (evt) {
+    evt.stopPropagation();
+
+    bigPicture.remove();
+  });
+
   // Вызов отрисовывающе-добавляющей функии
   var elements = createCommentElements();
 
@@ -190,23 +182,6 @@ var uploadPicture = function () {
   // вставляем элемент в дом
   var imageUploadForm = document.querySelector('.img-upload__form');
   imageUploadForm.appendChild(pictureTemplate);
-
-  //  Сброс значения кнопки загрузки фото
-  var resetFileButton = function () {
-    var onEscPress = function (evt) {
-      if (evt.keyCode === ESC_KEYCODE) {
-        document.getElementById('upload-file').value = '';
-        document.removeEventListener('keydown', onEscPress);
-      }
-    };
-
-    document.addEventListener('keydown', onEscPress);
-
-    pictureTemplate.querySelector('.cancel').addEventListener('click', function () {
-      document.getElementById('upload-file').value = '';
-      document.removeEventListener('keydown', onEscPress);
-    });
-  };
 
   // Работа с эффектами
   var mainImage = imageUploadForm.querySelector('.img-upload__preview img');
@@ -291,6 +266,42 @@ var uploadPicture = function () {
 
   });
 
+  // Закрытие попапа
+  var onEscPress = function (evt) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      document.getElementById('upload-file').value = '';
+      pictureTemplate.remove();
+    }
+  };
+
+  pictureTemplate.addEventListener('keydown', onEscPress);
+
+  pictureTemplate.querySelector('.cancel').addEventListener('click', function (evt) {
+    evt.stopPropagation();
+
+    document.getElementById('upload-file').value = '';
+
+    pictureTemplate.remove();
+  });
+
+
+  // Проверка исключений нажатий на esc
+  var exceptionTextAreaElement = pictureTemplate.querySelector('.text__description');
+  var exceptionInputElement = pictureTemplate.querySelector('.text__hashtags');
+
+  var checkException = function (exception) {
+    exception.addEventListener('focus', function () {
+      pictureTemplate.removeEventListener('keydown', onEscPress);
+    });
+
+    exception.addEventListener('focusout', function () {
+      pictureTemplate.addEventListener('keydown', onEscPress);
+    });
+  };
+
+  checkException(exceptionInputElement);
+  checkException(exceptionTextAreaElement);
+
   // разные фильтры
   addOtherEffect('chrome');
   addOtherEffect('sepia');
@@ -298,8 +309,6 @@ var uploadPicture = function () {
   addOtherEffect('phobos');
   addOtherEffect('heat');
 
-  closeTemplate(pictureTemplate);
-  resetFileButton();
 };
 
 
