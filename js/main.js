@@ -320,8 +320,8 @@ pictureList.addEventListener('click', function (evt) {
   var picturesArray = Array.from(pictureItems);
   var target = evt.target;
 
-  while (target !== pictureList) {
-    if (target.tagName === 'A') {
+  while (target && target !== pictureList) {
+    if (target.classList.contains('picture')) {
       var index = picturesArray.indexOf(target);
       createBigPicture(posts[index]);
       return;
