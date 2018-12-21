@@ -339,3 +339,6 @@ uploadFile.addEventListener('change', function (evt) {
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
+
+// sadasdsadsadsadsa
+// dsgdcbcvxgfdgrfhcvx
