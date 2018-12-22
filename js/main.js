@@ -186,7 +186,8 @@ var uploadPicture = function () {
   // Работа с эффектами
   var mainImage = imageUploadForm.querySelector('.img-upload__preview img');
   var effectsContainer = imageUploadForm.querySelector('.effects');
-  imageUploadForm.querySelector('.effect-level').classList.add('hidden');
+  var sliderContainer = document.querySelector('.effect-level');
+  sliderContainer.classList.add('hidden');
 
   var addOnlyOneClassToImage = function (classString) {
     var image = mainImage;
@@ -199,24 +200,112 @@ var uploadPicture = function () {
     classes.add(classString);
   };
 
-  // оригинал
-  var original = effectsContainer.querySelector('#effect-none');
-  original.addEventListener('click', function () {
-    addOnlyOneClassToImage();
-    imageUploadForm.querySelector('.effect-level').classList.add('hidden');
-  });
-
   // Функция для разных эффектов
   var addOtherEffect = function (effect) {
+
     var effectClass = 'effects__preview--' + effect;
-    var effectId = '#effect-' + effect;
-    var effectName = effectsContainer.querySelector(effectId);
-    effectName.addEventListener('click', function () {
-      addOnlyOneClassToImage(effectClass);
-      imageUploadForm.querySelector('.effect-level').classList.remove('hidden');
-    });
+
+    addOnlyOneClassToImage(effectClass);
+    sliderContainer.classList.remove('hidden');
+    mainImage.classList.remove('effects__preview--none');
+
   };
 
+  // Переменные для слайдера
+  var sliderLine = sliderContainer.querySelector('.effect-level__line');
+  var sliderPin = sliderContainer.querySelector('.effect-level__pin');
+  var sliderDepthLine = sliderContainer.querySelector('.effect-level__depth');
+  var filterInput = sliderContainer.querySelector('.effect-level__value');
+
+  // СЛАЙДЕР
+  // Значения по умолчанию
+  sliderPin.style.left = 100 + '%';
+  sliderDepthLine.style.width = 100 + '%';
+
+  // Сброс на значение по умолчанию при клике на другой фильтр
+  effectsContainer.addEventListener('click', function () {
+    sliderPin.style.left = 100 + '%';
+    sliderDepthLine.style.width = 100 + '%';
+    filterInput.setAttribute('value', 100);
+  });
+
+  sliderPin.addEventListener('mousedown', function (evt) {
+    evt.preventDefault();
+
+    //  Получить уоординаты элемента
+    var getCoords = function (element) {
+
+      var box = element.getBoundingClientRect();
+
+      return {
+        top: box.top + pageYOffset,
+        left: box.left + pageXOffset
+      };
+
+    };
+
+    var sliderPinCoords = getCoords(sliderPin);
+    var xCoord = evt.pageX - sliderPinCoords.left;
+
+    var sliderLineCoords = getCoords(sliderLine);
+
+    var onMouseMove = function (moveEvt) {
+      moveEvt.preventDefault();
+
+      var leftSide = moveEvt.pageX - xCoord - sliderLineCoords.left;
+
+      if (leftSide < 0) {
+        leftSide = 0;
+      }
+
+      var rightSide = sliderLine.offsetWidth;
+      if (leftSide > rightSide) {
+        leftSide = rightSide;
+      }
+
+      sliderPin.style.left = leftSide + 'px';
+      sliderDepthLine.style.width = (leftSide + xCoord / sliderLine.offsetWidth) + 'px';
+
+      //  Запись значения в инпут
+      var valueOfFilterInput = (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * 100;
+      filterInput.setAttribute('value', valueOfFilterInput);
+
+      //  Запись в фильтры
+      //  CHROME
+      if (mainImage.classList.contains('effects__preview--chrome')) {
+        mainImage.style.filter = 'grayscale(' + (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) + ')';
+
+      //  SEPIA
+      } else if (mainImage.classList.contains('effects__preview--sepia')) {
+        mainImage.style.filter = 'sepia(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth + ')';
+
+      //  MARVIN
+      } else if (mainImage.classList.contains('effects__preview--marvin')) {
+        mainImage.style.filter = 'invert(' + (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * 100 + '%)';
+
+      //  PHOBOS
+      } else if (mainImage.classList.contains('effects__preview--phobos')) {
+        mainImage.style.filter = 'blur(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * 3 + 'px)';
+
+      //  HEAT
+      } else if (mainImage.classList.contains('effects__preview--heat')) {
+        mainImage.style.filter = 'brightness(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * 3 + ')';
+      }
+
+    };
+
+    var onMouseUp = function (upEvt) {
+      upEvt.preventDefault();
+
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  });
+
+  // О поле с хэштэгами
   var formSubmitButton = imageUploadForm.querySelector('#upload-submit');
 
   formSubmitButton.addEventListener('click', function () {
@@ -302,12 +391,56 @@ var uploadPicture = function () {
   checkException(exceptionInputElement);
   checkException(exceptionTextAreaElement);
 
+
   // разные фильтры
-  addOtherEffect('chrome');
-  addOtherEffect('sepia');
-  addOtherEffect('marvin');
-  addOtherEffect('phobos');
-  addOtherEffect('heat');
+  // оригинал
+  effectsContainer.querySelector('#effect-none')
+    .addEventListener('click', function () {
+      mainImage.classList.add('effects__preview--none');
+      mainImage.style.filter = 'none';
+      sliderContainer.classList.add('hidden');
+    });
+
+
+  // CHROME
+  effectsContainer.querySelector('#effect-chrome')
+    .addEventListener('click', function () {
+      addOtherEffect('chrome');
+      mainImage.style.filter = 'grayscale(1)';
+    });
+
+
+  // SEPIA
+  effectsContainer.querySelector('#effect-sepia')
+    .addEventListener('click', function () {
+      addOtherEffect('sepia');
+      mainImage.style.filter = 'sepia(1)';
+    });
+
+
+  // MARVIN
+  effectsContainer.querySelector('#effect-marvin')
+    .addEventListener('click', function () {
+      addOtherEffect('marvin');
+      mainImage.style.filter = 'invert(100%)';
+    });
+
+
+  // PHOBOS
+  effectsContainer.querySelector('#effect-phobos')
+    .addEventListener('click', function () {
+      addOtherEffect('phobos');
+      mainImage.style.filter = 'blur(3px)';
+    });
+
+
+  // HEAT
+  effectsContainer.querySelector('#effect-heat')
+    .addEventListener('click', function () {
+      addOtherEffect('heat');
+      mainImage.style.filter = 'brightness(3)';
+    });
+
 
 };
 
@@ -339,6 +472,3 @@ uploadFile.addEventListener('change', function (evt) {
 // ВЫЗОВЫ
 var posts = createPostsArray();
 createPhotos(posts);
-
-// sadasdsadsadsadsa
-// dsgdcbcvxgfdgrfhcvx
