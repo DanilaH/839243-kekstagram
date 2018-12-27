@@ -1,24 +1,28 @@
 'use strict';
 
 (function () {
-  window.createBigPicture = function (post) {
-    var bigPicture = document.querySelector('#big-picture')
+
+  var bigPicture = document.querySelector('#big-picture')
         .content
-        .cloneNode(true)
         .querySelector('.big-picture');
 
-    var main = document.querySelector('#main');
-    main.appendChild(bigPicture);
+  var main = document.querySelector('#main');
 
-    bigPicture.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
-    bigPicture.querySelector('.likes-count').textContent = post.likes;
-    bigPicture.querySelector('.social__caption').textContent = 'Бла-бла-бла, описание фотографии';
-
-    //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
-    var commentTemplate = document.querySelector('#social__comment')
+  var commentTemplate = document.querySelector('#social__comment')
         .content
         .querySelector('.social__comment');
 
+  var createBigPicture = function (post) {
+
+    var bigPictureNode = bigPicture.cloneNode(true);
+
+    main.appendChild(bigPictureNode);
+
+    bigPictureNode.querySelector('.big-picture__img img').setAttribute('src', 'photos/' + post.url + '.jpg');
+    bigPictureNode.querySelector('.likes-count').textContent = post.likes;
+    bigPictureNode.querySelector('.social__caption').textContent = 'Бла-бла-бла, описание фотографии';
+
+    //  Рисование комментариев под "БОЛЬШОЙ КАРТИНКОЙ"
     var createCommentElement = function (samePost, template) {
       var commentElement = template.cloneNode(true);
 
@@ -37,16 +41,16 @@
     };
 
     // Закрытие попапа
-    bigPicture.addEventListener('keydown', function (evt) {
+    bigPictureNode.addEventListener('keydown', function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        bigPicture.remove();
+        bigPictureNode.remove();
       }
     });
 
-    bigPicture.querySelector('.cancel').addEventListener('click', function (evt) {
+    bigPictureNode.querySelector('.cancel').addEventListener('click', function (evt) {
       evt.preventDefault();
 
-      bigPicture.remove();
+      bigPictureNode.remove();
     });
 
     // Вызов отрисовывающе-добавляющей функии
@@ -55,11 +59,13 @@
     var commentsList = document.querySelector('.social__comments');
     commentsList.appendChild(elements);
 
-    var commentCount = bigPicture.querySelector('.social__comment-count');
-    var commentLoader = bigPicture.querySelector('.comments-loader');
+    var commentCount = bigPictureNode.querySelector('.social__comment-count');
+    var commentLoader = bigPictureNode.querySelector('.comments-loader');
 
     commentCount.classList.add('visually-hidden');
     commentLoader.classList.add('visually-hidden');
   };
+
+  window.createBigPicture = createBigPicture;
 
 })();

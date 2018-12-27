@@ -6,41 +6,34 @@
       .content
       .querySelector('.picture');
 
-  var createPhotos = function (posts) {
+  var createPostElement = function (post, template) {
+    var postElement = template.cloneNode(true);
 
-    var createPostElement = function (samePosts, template) {
-      var postElement = template.cloneNode(true);
+    postElement.querySelector('.picture__img').setAttribute('src', 'photos/' + post.url + '.jpg');
+    postElement.querySelector('.picture__likes').textContent = post.likes;
+    postElement.querySelector('.picture__comments').textContent = post.comments.length;
 
-      postElement.querySelector('.picture__img').setAttribute('src', 'photos/' + samePosts.url + '.jpg');
-      postElement.querySelector('.picture__likes').textContent = samePosts.likes;
-      postElement.querySelector('.picture__comments').textContent = samePosts.comments.length;
+    postElement.addEventListener('click', function () {
+      window.createBigPicture(post);
+    });
 
-      postElement.addEventListener('click', function () {
-        window.createBigPicture(samePosts);
-      });
-
-      return postElement;
-    };
-
-    var createPostElements = function (samePosts) {
-      var fragment = document.createDocumentFragment();
-
-      for (var i = 0; i < samePosts.length; i++) {
-        fragment.appendChild(createPostElement(samePosts[i], similarPhotoTemplate));
-      }
-
-      return fragment;
-    };
-
-    var elements = createPostElements(posts);
-
-    var pictures = document.querySelector('.pictures');
-    pictures.appendChild(elements);
-
+    return postElement;
   };
 
-  var posts = window.dataset.createPostsArray();
+  var createPostElements = function (postsArray) {
+    var fragment = document.createDocumentFragment();
 
-  var photo = createPhotos(posts);
+    for (var i = 0; i < postsArray.length; i++) {
+      fragment.appendChild(createPostElement(postsArray[i], similarPhotoTemplate));
+    }
+
+    return fragment;
+  };
+
+  var posts = window.createPostsArray();
+  var elements = createPostElements(posts);
+
+  var pictures = document.querySelector('.pictures');
+  pictures.appendChild(elements);
 
 })();

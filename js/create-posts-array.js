@@ -43,9 +43,6 @@
     return posts;
   };
 
-  window.dataset = {
-    createCommentsArray: createCommentsArray,
-    createPostsArray: createPostsArray
-  };
+  window.createPostsArray = createPostsArray;
 
 })();
