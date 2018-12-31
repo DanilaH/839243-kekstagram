@@ -11,6 +11,7 @@
 
   var mainImage = pictureTemplate.querySelector('.img-upload__preview img');
 
+
   var uploadPicture = function () {
 
     document.body.classList.add('modal-open');
@@ -295,6 +296,9 @@
       evt.preventDefault();
 
     });
+
+    window.scaleImage(pictureTemplate, mainImage);
+
   };
 
   var uploadFile = document.querySelector('#upload-file');
