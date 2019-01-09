@@ -297,7 +297,7 @@
 
       imageUploadForm.removeEventListener('submit', send);
 
-    }
+    };
 
     // Отправка данных формы на сервер
     imageUploadForm.addEventListener('submit', send);
