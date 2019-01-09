@@ -279,8 +279,8 @@
         mainImage.style.filter = 'brightness(3)';
       });
 
-    // Отправка данных формы на сервер
-    imageUploadForm.addEventListener('submit', function (evt) {
+
+    var send = function (evt) {
 
       window.backend.saveData(new FormData(imageUploadForm), window.messages.onLoad, window.messages.onError);
 
@@ -295,7 +295,13 @@
 
       evt.preventDefault();
 
-    });
+      imageUploadForm.removeEventListener('submit', send);
+
+    }
+
+    // Отправка данных формы на сервер
+    imageUploadForm.addEventListener('submit', send);
+
 
     window.scaleImage(pictureTemplate, mainImage);
 
