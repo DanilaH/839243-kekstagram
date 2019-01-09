@@ -39,13 +39,11 @@
     var xhr = new XMLHttpRequest();
     xhr.responseType = 'json';
 
-    xhr.addEventListener('load', function () {
+    if (xhr.status === 200) {
       onLoad(xhr.response);
-    });
-
-    xhr.addEventListener('error', function () {
+    } else {
       onError();
-    });
+    }
 
     xhr.open('POST', SAVE_URL);
     xhr.send(data);

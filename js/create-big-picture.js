@@ -6,13 +6,15 @@
         .content
         .querySelector('.big-picture');
 
+  var main = document.querySelector('#main');
+
   var createBigPicture = function (post) {
 
     document.body.classList.add('modal-open');
 
     var bigPictureNode = bigPicture.cloneNode(true);
 
-    window.utils.MAIN.appendChild(bigPictureNode);
+    main.appendChild(bigPictureNode);
 
     bigPictureNode.querySelector('.big-picture__img img').setAttribute('src', post.url);
     bigPictureNode.querySelector('.likes-count').textContent = post.likes;

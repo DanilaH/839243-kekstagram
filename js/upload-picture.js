@@ -282,6 +282,8 @@
     // Отправка данных формы на сервер
     imageUploadForm.addEventListener('submit', function (evt) {
 
+      window.backend.saveData(new FormData(imageUploadForm), window.messages.onLoad, window.messages.onError);
+
       imageUploadForm.reset();
 
       addOtherEffect('none');
@@ -290,8 +292,6 @@
       pictureTemplate.remove();
 
       document.body.removeAttribute('class');
-
-      window.backend.saveData(new FormData(imageUploadForm), window.messages.onLoad, window.messages.onError);
 
       evt.preventDefault();
 

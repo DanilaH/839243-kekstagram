@@ -37,7 +37,6 @@
     ESC_KEYCODE: 27,
     getRandomFromArray: getRandomFromArray,
     getKindOfRandomFromArray: getKindOfRandomFromArray,
-    getRandomNumber: getRandomNumber,
-    MAIN: document.querySelector('#main')
+    getRandomNumber: getRandomNumber
   };
 })();

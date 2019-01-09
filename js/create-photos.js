@@ -22,8 +22,6 @@
     return postElement;
   };
 
-
-  // Отрисовка взятых элементов
   var successHandler = function (postsArray) {
     var fragment = document.createDocumentFragment();
 
@@ -34,7 +32,6 @@
     pictures.appendChild(fragment);
   };
 
-  // Ошибка при их незагрузке (я подтянул это с учебного, да)
   var errorHandler = function (errorMessage) {
     var node = document.createElement('div');
     node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: #FF4D4D; line-height: 48px;';
