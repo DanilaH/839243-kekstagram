@@ -182,16 +182,28 @@
 
     });
 
+
+    // возвращение значений в форме
+    var scaleInput = pictureTemplate.querySelector('.scale__control--value');
+    var resetForm = function () {
+
+      imageUploadForm.reset();
+
+      addOtherEffect('none');
+      mainImage.style.filter = 'none';
+
+      mainImage.style.transform = 'scale(' + window.scale.defaultValue + ')';
+      scaleInput.setAttribute('value', window.scale.defaultValue * window.scale.percentValue + '%');
+
+      pictureTemplate.remove();
+
+      document.body.removeAttribute('class');
+
+    };
+
     var onEscPress = function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        document.body.removeAttribute('class');
-
-        addOtherEffect('none');
-        mainImage.style.filter = 'none';
-
-        imageUploadForm.reset();
-
-        pictureTemplate.remove();
+        resetForm();
       }
     };
 
@@ -201,14 +213,7 @@
     pictureTemplate.querySelector('.cancel').addEventListener('click', function (evt) {
       evt.preventDefault();
 
-      document.body.removeAttribute('class');
-
-      addOtherEffect('none');
-      mainImage.style.filter = 'none';
-
-      imageUploadForm.reset();
-
-      pictureTemplate.remove();
+      resetForm();
     });
 
 
@@ -279,19 +284,12 @@
         mainImage.style.filter = 'brightness(3)';
       });
 
-
+    // Отправка данных формы на сервер
     var send = function (evt) {
 
       window.backend.saveData(new FormData(imageUploadForm), window.messages.onLoad, window.messages.onError);
 
-      imageUploadForm.reset();
-
-      addOtherEffect('none');
-      mainImage.style.filter = 'none';
-
-      pictureTemplate.remove();
-
-      document.body.removeAttribute('class');
+      resetForm();
 
       evt.preventDefault();
 
@@ -299,9 +297,7 @@
 
     };
 
-    // Отправка данных формы на сервер
     imageUploadForm.addEventListener('submit', send);
-
 
     window.scaleImage(pictureTemplate, mainImage);
 
