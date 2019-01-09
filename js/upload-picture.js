@@ -1,42 +1,40 @@
 'use strict';
 
 (function () {
-  var uploadPicture = function () {
-    // Генерация шаблона
-    var pictureTemplate = document.querySelector('#img-upload__overlay')
+
+  var pictureTemplate = document.querySelector('#img-upload__overlay')
         .content
         .cloneNode(true)
         .querySelector('.img-upload__overlay');
 
+  var imageUploadForm = document.querySelector('.img-upload__form');
+
+  var mainImage = pictureTemplate.querySelector('.img-upload__preview img');
+
+
+  var uploadPicture = function () {
+
+    document.body.classList.add('modal-open');
+
     // вставляем элемент в дом
-    var imageUploadForm = document.querySelector('.img-upload__form');
     imageUploadForm.appendChild(pictureTemplate);
 
     // Работа с эффектами
-    var mainImage = imageUploadForm.querySelector('.img-upload__preview img');
     var effectsContainer = imageUploadForm.querySelector('.effects');
     var sliderContainer = document.querySelector('.effect-level');
     sliderContainer.classList.add('hidden');
 
-    var addOnlyOneClassToImage = function (classString) {
-      var image = mainImage;
-      var classes = image.classList;
-
-      for (var i = 1; i <= classes.length; i++) {
-        classes.remove(classes[0]);
-      }
-
-      classes.add(classString);
-    };
-
     // Функция для разных эффектов
     var addOtherEffect = function (effect) {
+      var classes = mainImage.classList;
+
+      classes.remove(classes[0]);
 
       var effectClass = 'effects__preview--' + effect;
 
-      addOnlyOneClassToImage(effectClass);
+      classes.add(effectClass);
+
       sliderContainer.classList.remove('hidden');
-      mainImage.classList.remove('effects__preview--none');
 
     };
 
@@ -184,20 +182,31 @@
 
     });
 
-    // Закрытие попапа
     var onEscPress = function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        document.querySelector('#upload-file').value = '';
+        document.body.removeAttribute('class');
+
+        addOtherEffect('none');
+        mainImage.style.filter = 'none';
+
+        imageUploadForm.reset();
+
         pictureTemplate.remove();
       }
     };
 
+    // Закрытие попапа
     pictureTemplate.addEventListener('keydown', onEscPress);
 
     pictureTemplate.querySelector('.cancel').addEventListener('click', function (evt) {
       evt.preventDefault();
 
-      document.querySelector('#upload-file').value = '';
+      document.body.removeAttribute('class');
+
+      addOtherEffect('none');
+      mainImage.style.filter = 'none';
+
+      imageUploadForm.reset();
 
       pictureTemplate.remove();
     });
@@ -225,7 +234,7 @@
     // оригинал
     effectsContainer.querySelector('#effect-none')
       .addEventListener('click', function () {
-        mainImage.classList.add('effects__preview--none');
+        addOtherEffect('none');
         mainImage.style.filter = 'none';
         sliderContainer.classList.add('hidden');
       });
@@ -269,6 +278,32 @@
         addOtherEffect('heat');
         mainImage.style.filter = 'brightness(3)';
       });
+
+
+    var send = function (evt) {
+
+      window.backend.saveData(new FormData(imageUploadForm), window.messages.onLoad, window.messages.onError);
+
+      imageUploadForm.reset();
+
+      addOtherEffect('none');
+      mainImage.style.filter = 'none';
+
+      pictureTemplate.remove();
+
+      document.body.removeAttribute('class');
+
+      evt.preventDefault();
+
+      imageUploadForm.removeEventListener('submit', send);
+
+    };
+
+    // Отправка данных формы на сервер
+    imageUploadForm.addEventListener('submit', send);
+
+
+    window.scaleImage(pictureTemplate, mainImage);
 
   };
 
