@@ -25,7 +25,10 @@
     return postElement;
   };
 
-  window.createPostElement = createPostElement;
+  var filters = document.querySelector('.img-filters');
+  var popularPosts = filters.querySelector('#filter-popular');
+  var newPosts = filters.querySelector('#filter-new');
+  var discussedPosts = filters.querySelector('#filter-discussed');
 
   // Функция одинаковых действий
   var deletePictureElements = function (whichButton) {
@@ -36,23 +39,13 @@
     });
 
     // удаляю активный класс у кнопки фильтра
-    filters.querySelectorAll('.img-filters__button').forEach(function (element) {
-
-      if (element.classList.contains('img-filters__button--active')) {
-        element.classList.remove('img-filters__button--active');
-      }
-
-    });
+    filters.querySelector('.img-filters__button--active').classList.remove('img-filters__button--active');
 
     whichButton.classList.add('img-filters__button--active');
   };
 
-  var filters = document.querySelector('.img-filters');
-  var popularPosts = filters.querySelector('#filter-popular');
-  var newPosts = filters.querySelector('#filter-new');
-  var discussedPosts = filters.querySelector('#filter-discussed');
   // Функция для популярных постов
-  var successHandlerPopular = function (postsArray) {
+  var handlerPopular = function (postsArray) {
     var fragment = document.createDocumentFragment();
 
     filters.classList.remove('img-filters--inactive');
@@ -64,15 +57,16 @@
     deletePictureElements(popularPosts);
     pictures.appendChild(fragment);
 
+    return postsArray;
   };
 
   // для случайных постов
-  var successHandlerNew = function (postsArray) {
+  var handlerNew = function (similarPostsArray) {
     var fragment = document.createDocumentFragment();
     var array = [];
 
     for (var j = 0; j < NEW_POSTS_AMOUNT; j++) {
-      array[j] = window.utils.getKindOfRandomFromArray(postsArray);
+      array[j] = window.utils.getKindOfRandomFromArray(similarPostsArray);
     }
 
     for (var i = 0; i < array.length; i++) {
@@ -81,15 +75,14 @@
 
     deletePictureElements(newPosts);
     pictures.appendChild(fragment);
-
   };
 
   // для обсуждаемых постов
-  var successHandlerDiscussed = function (postsArray) {
+  var handlerDiscussed = function (similarPostsArray) {
 
     var fragment = document.createDocumentFragment();
 
-    postsArray.sort(function (first, second) {
+    similarPostsArray.sort(function (first, second) {
 
       if (first.comments.length < second.comments.length) {
         return 1;
@@ -101,8 +94,8 @@
 
     });
 
-    for (var i = 0; i < postsArray.length; i++) {
-      fragment.appendChild(createPostElement(postsArray[i], similarPhotoTemplate));
+    for (var i = 0; i < similarPostsArray.length; i++) {
+      fragment.appendChild(createPostElement(similarPostsArray[i], similarPhotoTemplate));
     }
 
     deletePictureElements(discussedPosts);
@@ -122,42 +115,48 @@
     document.body.insertAdjacentElement('afterbegin', node);
   };
 
-  // навешивание обработчиков для показа постов
-  // популярные
-  popularPosts.addEventListener('click', function (evt) {
-    evt.preventDefault();
 
-    deletePictureElements(popularPosts);
+  var successHandler = function (data) {
+    var postsArray = data;
+    handlerPopular(data);
 
-    window.debounce(function () {
-      window.backend.loadData(successHandlerPopular, errorHandler);
+    // навешивание обработчиков для показа постов
+    // популярные
+    popularPosts.addEventListener('click', function (evt) {
+      evt.preventDefault();
+
+      window.debounce(function () {
+        handlerPopular(postsArray);
+      });
+
     });
 
-  });
+    // случайные
+    newPosts.addEventListener('click', function (evt) {
+      evt.preventDefault();
 
-  // случайные
-  newPosts.addEventListener('click', function (evt) {
-    evt.preventDefault();
+      var similarPostsArray = postsArray.slice();
 
-    deletePictureElements(newPosts);
-
-    window.debounce(function () {
-      window.backend.loadData(successHandlerNew, errorHandler);
+      window.debounce(function () {
+        handlerNew(similarPostsArray);
+      });
     });
-  });
 
-  // обсуждаемые
-  discussedPosts.addEventListener('click', function (evt) {
-    evt.preventDefault();
+    // обсуждаемые
+    discussedPosts.addEventListener('click', function (evt) {
+      evt.preventDefault();
 
-    deletePictureElements(discussedPosts);
+      var similarPostsArray = postsArray.slice();
 
-    window.debounce(function () {
-      window.backend.loadData(successHandlerDiscussed, errorHandler);
+      window.debounce(function () {
+        handlerDiscussed(similarPostsArray);
+      });
     });
-  });
+
+  };
 
   // вызов популярных постов, которые по умолчанию
-  window.backend.loadData(successHandlerPopular, errorHandler);
+  window.backend.loadData(successHandler, errorHandler);
+  window.createPostElement = createPostElement;
 
 })();

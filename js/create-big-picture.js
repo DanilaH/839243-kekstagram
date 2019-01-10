@@ -2,9 +2,6 @@
 
 (function () {
 
-  // количество прибавляемых и выидимых изначально комментариев
-  var COMMENTS_AMOUNT = 5;
-
   var bigPicture = document.querySelector('#big-picture')
         .content
         .querySelector('.big-picture');
@@ -24,10 +21,6 @@
     bigPictureNode.querySelector('.social__caption').textContent = post.description;
     bigPictureNode.querySelector('.comments-count').textContent = post.comments.length;
 
-    if (post.comments.length < COMMENTS_AMOUNT) {
-      bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
-    }
-
     // Закрытие попапа
     bigPictureNode.addEventListener('keydown', function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {
@@ -44,72 +37,40 @@
       bigPictureNode.remove();
     });
 
-    // Вызов отрисовывающе-добавляющей функии
-    var comments = window.createComments(post);
 
-    var commentsList = document.querySelector('.social__comments');
-    commentsList.appendChild(comments);
-
-    // Массив комментариев из NodeList
-    var commentsElements = Array.from(commentsList.querySelectorAll('.social__comment'));
+    var commentsList = bigPictureNode.querySelector('.social__comments');
     var commentsLoaderButton = bigPictureNode.querySelector('.social__comments-loader');
-    //  спрятать кнопку, если меньше пяти комментариев
-    if (commentsElements.length <= COMMENTS_AMOUNT) {
+    // спрятать кнопку, если меньше или пять комментариев
+    if (post.comments.length <= window.utils.COMMENTS_AMOUNT) {
       commentsLoaderButton.classList.add('visually-hidden');
+      bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
     }
 
-    // прибавить к элементам массива visually-hidden но не к пяти показываемым
-    commentsElements.forEach(function (element, i) {
-      if (i >= COMMENTS_AMOUNT) {
-        element.classList.add('visually-hidden');
+    // функция отрисовкb комментариев
+    var comments = post.comments.slice();
+    var addComments = function () {
+
+      if (comments.length < window.utils.COMMENTS_AMOUNT) {
+        commentsList.appendChild(window.createCommentsElements(post, comments.length));
+        commentsLoaderButton.classList.add('visually-hidden');
+        return;
       }
-    });
 
-    // массив спрятанных комментарие
-    var visHidCommentsElements = Array.from(commentsList.querySelectorAll('.visually-hidden'));
+      commentsList.appendChild(window.createCommentsElements(post, window.utils.COMMENTS_AMOUNT));
+      comments.splice(0, window.utils.COMMENTS_AMOUNT);
+    };
 
-    // обработчик кнопки
+    // первые 5 комментариев
+    addComments();
+
     commentsLoaderButton.addEventListener('click', function (evt) {
       evt.preventDefault();
 
-      // убирать viseally-hidden у пяти элементов
-      for (var i = 0; i < COMMENTS_AMOUNT; i++) {
+      addComments();
 
-        //
-        // проверить меньше ли элементов, чем 5. И тогда у них всех удалить visually-hidden
-        // по-другому я не понял, как сделать.
-        // Здесь я что-то долго мучился
-        //
-        //  .comment - выдуманный класс. Я его добавил, чтобы отображать количество элементов в social__comment-counter
-        //
+      var visibleComments = commentsList.querySelectorAll('.social__comment');
 
-        if (visHidCommentsElements.length < COMMENTS_AMOUNT) {
-
-          visHidCommentsElements.forEach(function (element) {
-            element.classList.remove('visually-hidden');
-            element.classList.add('comment');
-          });
-
-          commentsLoaderButton.classList.add('visually-hidden');
-
-          // выход из цикла при выполнении условия
-          break;
-        }
-
-        visHidCommentsElements[i].classList.remove('visually-hidden');
-        visHidCommentsElements[i].classList.add('comment');
-      }
-
-      // убирать элементы, у которых уже нет класса
-      for (var j = 0; j < COMMENTS_AMOUNT; j++) {
-        visHidCommentsElements.shift();
-      }
-
-      // Содержание поля количества комментариев
-
-      // приплюсовал COMMENTS_AMOUNT, чтобы количество элементов было правильным
-      var notVisHid = commentsList.querySelectorAll('.comment').length + COMMENTS_AMOUNT;
-      bigPictureNode.querySelector('.social__comment-count').textContent = notVisHid + ' из ' + post.comments.length + ' комментариев';
+      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + post.comments.length + ' комментариев';
 
     });
 

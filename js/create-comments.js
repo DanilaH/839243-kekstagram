@@ -15,17 +15,17 @@
     return commentElement;
   };
 
-  var createComments = function (post) {
+  var createCommentsElements = function (post, number) {
 
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < post.comments.length; i++) {
+    for (var i = 0; i < number; i++) {
       fragment.appendChild(createCommentElement(post.comments[i], commentTemplate));
     }
 
     return fragment;
   };
 
-  window.createComments = createComments;
+  window.createCommentsElements = createCommentsElements;
 
 })();
