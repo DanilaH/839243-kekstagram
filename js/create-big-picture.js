@@ -46,21 +46,23 @@
       bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
     }
 
-    // функция отрисовкb комментариев
-
-    // схранить количество коментариев
-    var commentsValue = post.comments.length;
+    // функция отрисовки комментариев
+    var minValue = 0;
+    var maxvalue = 5;
 
     var addComments = function () {
 
-      if (post.comments.length <= window.utils.COMMENTS_AMOUNT) {
-        commentsList.appendChild(window.createCommentsElements(post, post.comments.length));
+      var comments = post.comments.slice(minValue, maxvalue);
+
+      commentsList.appendChild(window.createCommentsElements(comments, comments.length));
+
+      if (maxvalue >= post.comments.length) {
         commentsLoaderButton.classList.add('visually-hidden');
-        return;
       }
 
-      commentsList.appendChild(window.createCommentsElements(post, window.utils.COMMENTS_AMOUNT));
-      post.comments.splice(0, window.utils.COMMENTS_AMOUNT);
+      minValue += window.utils.COMMENTS_AMOUNT;
+      maxvalue += window.utils.COMMENTS_AMOUNT;
+
     };
 
     // первые 5 комментариев
@@ -73,7 +75,7 @@
 
       var visibleComments = commentsList.querySelectorAll('.social__comment');
 
-      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + commentsValue + ' комментариев';
+      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + post.comments.length + ' комментариев';
 
     });
 

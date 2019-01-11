@@ -20,7 +20,7 @@
     var fragment = document.createDocumentFragment();
 
     for (var i = 0; i < number; i++) {
-      fragment.appendChild(createCommentElement(post.comments[i], commentTemplate));
+      fragment.appendChild(createCommentElement(post[i], commentTemplate));
     }
 
     return fragment;
