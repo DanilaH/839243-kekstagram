@@ -2,6 +2,8 @@
 
 (function () {
 
+  var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
   var pictureTemplate = document.querySelector('#img-upload__overlay')
         .content
         .cloneNode(true)
@@ -303,10 +305,37 @@
 
   };
 
+  var filtersLabels = Array.from(pictureTemplate.querySelectorAll('.effects__preview'));
   var uploadFile = document.querySelector('#upload-file');
   uploadFile.addEventListener('change', function (evt) {
+
     evt.preventDefault();
+
+    var file = uploadFile.files[0];
+    var fileName = file.name.toLowerCase();
+
+    var matches = FILE_TYPES.some(function (it) {
+      return fileName.endsWith(it);
+    });
+
+    if (matches) {
+      var reader = new FileReader();
+
+      reader.addEventListener('load', function () {
+
+        mainImage.src = reader.result;
+
+        filtersLabels.forEach(function (element) {
+          element.style = 'background-image: url(' + reader.result + ')';
+        });
+
+      });
+
+      reader.readAsDataURL(file);
+    }
+
     uploadPicture();
+
   });
 
 })();
