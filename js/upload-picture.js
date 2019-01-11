@@ -3,6 +3,10 @@
 (function () {
 
   var FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+  var HASHTAG_LENGTH = 20;
+  var MAX_HASHTAGS = 5;
+  var PERCENTAGE = 100;
+  var MAX_FILTER_VALUE = 3;
 
   var pictureTemplate = document.querySelector('#img-upload__overlay')
         .content
@@ -48,14 +52,14 @@
 
     // СЛАЙДЕР
     // Значения по умолчанию
-    sliderPin.style.left = 100 + '%';
-    sliderDepthLine.style.width = 100 + '%';
+    sliderPin.style.left = PERCENTAGE + '%';
+    sliderDepthLine.style.width = PERCENTAGE + '%';
 
     // Сброс на значение по умолчанию при клике на другой фильтр
     effectsContainer.addEventListener('click', function () {
-      sliderPin.style.left = 100 + '%';
-      sliderDepthLine.style.width = 100 + '%';
-      filterInput.setAttribute('value', 100);
+      sliderPin.style.left = PERCENTAGE + '%';
+      sliderDepthLine.style.width = PERCENTAGE + '%';
+      filterInput.setAttribute('value', PERCENTAGE);
     });
 
     sliderPin.addEventListener('mousedown', function (evt) {
@@ -96,7 +100,7 @@
         sliderDepthLine.style.width = (leftSide + xCoord / sliderLine.offsetWidth) + 'px';
 
         //  Запись значения в инпут
-        var valueOfFilterInput = (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * 100;
+        var valueOfFilterInput = (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * PERCENTAGE;
         filterInput.setAttribute('value', valueOfFilterInput);
 
         //  Запись в фильтры
@@ -110,15 +114,15 @@
 
         //  MARVIN
         } else if (mainImage.classList.contains('effects__preview--marvin')) {
-          mainImage.style.filter = 'invert(' + (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * 100 + '%)';
+          mainImage.style.filter = 'invert(' + (sliderDepthLine.offsetWidth / sliderLine.offsetWidth) * PERCENTAGE + '%)';
 
         //  PHOBOS
         } else if (mainImage.classList.contains('effects__preview--phobos')) {
-          mainImage.style.filter = 'blur(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * 3 + 'px)';
+          mainImage.style.filter = 'blur(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * MAX_FILTER_VALUE + 'px)';
 
         //  HEAT
         } else if (mainImage.classList.contains('effects__preview--heat')) {
-          mainImage.style.filter = 'brightness(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * 3 + ')';
+          mainImage.style.filter = 'brightness(' + sliderDepthLine.offsetWidth / sliderLine.offsetWidth * MAX_FILTER_VALUE + ')';
         }
 
       };
@@ -136,13 +140,12 @@
 
     // О поле с хэштэгами
     var formSubmitButton = imageUploadForm.querySelector('#upload-submit');
+    var hashtagInput = imageUploadForm.querySelector('.text__hashtags');
 
     formSubmitButton.addEventListener('click', function () {
-
-      var hashtagInput = imageUploadForm.querySelector('.text__hashtags');
       var totalHashtags = hashtagInput.value.split(' ');
 
-      if (totalHashtags.length > 5) {
+      if (totalHashtags.length > MAX_HASHTAGS) {
         hashtagInput.setCustomValidity('Нужно уменьшить количество хэштэгов, хотя бы до пяти');
         return;
       }
@@ -158,6 +161,7 @@
 
           if (totalHashtags[j] === totalHashtags[m]) {
             hashtagInput.setCustomValidity('Не должно быть повторяющихся хэштэгов');
+            hashtagInput.style = "border: 2px solid #FF4D4D";
             return;
           }
 
@@ -168,20 +172,24 @@
       for (var i = 0; i < totalHashtags.length; i++) {
         if (totalHashtags[i] === '') {
           hashtagInput.setCustomValidity('');
+          hashtagInput.style = "border: none";
         } else if (totalHashtags[i] === '#') {
           hashtagInput.setCustomValidity('Хэштэг не может состоять из одной решётки');
+          hashtagInput.style = "border: 2px solid #FF4D4D";
           return;
-        } else if (totalHashtags[i].length > 20) {
+        } else if (totalHashtags[i].length >= HASHTAG_LENGTH) {
           hashtagInput.setCustomValidity('Хэштэг не может состоять больше, чем из 20 символов');
+          hashtagInput.style = "border: 2px solid #FF4D4D";
           return;
         } else if (totalHashtags[i].charAt(0) !== '#') {
           hashtagInput.setCustomValidity('Хэштэг должен начинаться с решётки');
+          hashtagInput.style = "border: 2px solid #FF4D4D";
           return;
         }
       }
 
       hashtagInput.setCustomValidity('');
-
+      hashtagInput.style = "border: none";
     });
 
 
@@ -195,11 +203,13 @@
       mainImage.style.filter = 'none';
 
       mainImage.style.transform = 'scale(' + window.scale.defaultValue + ')';
-      scaleInput.setAttribute('value', window.scale.defaultValue * window.scale.percentValue + '%');
+      scaleInput.setAttribute('value', window.scale.defaultValue * PERCENTAGE + '%');
 
       pictureTemplate.remove();
 
       document.body.removeAttribute('class');
+
+      document.removeEventListener('keydown', onEscPress);
 
     };
 
@@ -210,31 +220,25 @@
     };
 
     // Закрытие попапа
-    pictureTemplate.addEventListener('keydown', onEscPress);
-
-    pictureTemplate.querySelector('.cancel').addEventListener('click', function (evt) {
-      evt.preventDefault();
-
-      resetForm();
-    });
-
+    pictureTemplate.querySelector('.cancel').addEventListener('click', resetForm);
+    document.addEventListener('keydown', onEscPress);
 
     // Проверка исключений нажатий на esc
-    var exceptionTextAreaElement = pictureTemplate.querySelector('.text__description');
-    var exceptionInputElement = pictureTemplate.querySelector('.text__hashtags');
+    var textArea = pictureTemplate.querySelector('.text__description');
+    textArea.focus();
 
     var checkException = function (exception) {
       exception.addEventListener('focus', function () {
-        pictureTemplate.removeEventListener('keydown', onEscPress);
+        document.removeEventListener('keydown', onEscPress);
       });
 
       exception.addEventListener('focusout', function () {
-        pictureTemplate.addEventListener('keydown', onEscPress);
+        document.addEventListener('keydown', onEscPress);
       });
     };
 
-    checkException(exceptionInputElement);
-    checkException(exceptionTextAreaElement);
+    checkException(textArea);
+    checkException(hashtagInput);
 
 
     // разные фильтры

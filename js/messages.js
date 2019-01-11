@@ -12,48 +12,42 @@
 
   var main = document.querySelector('#main');
 
-  var onLoad = function () {
-    main.appendChild(successTemplate);
+  var closeMessage = function (template, button) {
+    main.appendChild(template);
 
-    successTemplate.addEventListener('keydown', function (evt) {
+    var onEscPress = function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        successTemplate.remove();
+        template.remove();
+        document.removeEventListener('keydown', onEscPress);
       }
+    };
+
+    document.addEventListener('keydown', onEscPress);
+
+    template.addEventListener('click', function () {
+      template.remove();
     });
 
+    button.focus();
+    button.addEventListener('click', function () {
+      template.remove();
+    });
+  };
+
+  var onLoad = function () {
 
     var button = successTemplate.querySelector('.success__button');
-    button.setAttribute('autofocus', 'autofocus');
-    button.addEventListener('click', function (evt) {
-      evt.preventDefault();
 
-      successTemplate.remove();
-    });
-
-    successTemplate.addEventListener('click', function () {
-      successTemplate.remove();
-    });
+    closeMessage(successTemplate, button);
 
   };
 
   var onError = function () {
-    main.appendChild(errorTemplate);
 
-    errorTemplate.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        errorTemplate.remove();
-      }
-    });
+    var button = errorTemplate.querySelector('.error__button');
 
-    errorTemplate.querySelector('.error__button').addEventListener('click', function (evt) {
-      evt.preventDefault();
+    closeMessage(errorTemplate, button);
 
-      errorTemplate.remove();
-    });
-
-    errorTemplate.addEventListener('click', function () {
-      errorTemplate.remove();
-    });
   };
 
   window.messages = {

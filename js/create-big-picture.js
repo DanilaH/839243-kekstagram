@@ -22,22 +22,27 @@
     bigPictureNode.querySelector('.comments-count').textContent = post.comments.length;
 
     // Закрытие попапа
-    bigPictureNode.addEventListener('keydown', function (evt) {
-      if (evt.keyCode === window.utils.ESC_KEYCODE) {
-        document.body.removeAttribute('class');
-        bigPictureNode.remove();
-      }
-    });
-
-    bigPictureNode.querySelector('.cancel').addEventListener('click', function (evt) {
-      evt.preventDefault();
+    var closeTemplate = function () {
 
       document.body.removeAttribute('class');
-
       bigPictureNode.remove();
-    });
 
+      document.removeEventListener('keydown', onEscPress);
+    }
 
+    var onEscPress = function (evt) {
+      if (evt.keyCode === window.utils.ESC_KEYCODE) {
+        closeTemplate();
+      }
+    };
+
+    document.addEventListener('keydown', onEscPress);
+
+    var cancel = bigPictureNode.querySelector('.cancel');
+    cancel.addEventListener('click', closeTemplate);
+    cancel.focus();
+
+    // про комментарии
     var commentsList = bigPictureNode.querySelector('.social__comments');
     var commentsLoaderButton = bigPictureNode.querySelector('.social__comments-loader');
     // спрятать кнопку, если меньше или пять комментариев
