@@ -53,7 +53,7 @@
 
     var addComments = function () {
 
-      if (post.comments.length < window.utils.COMMENTS_AMOUNT) {
+      if (post.comments.length <= window.utils.COMMENTS_AMOUNT) {
         commentsList.appendChild(window.createCommentsElements(post, post.comments.length));
         commentsLoaderButton.classList.add('visually-hidden');
         return;
