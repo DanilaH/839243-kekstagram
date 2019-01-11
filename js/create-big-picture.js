@@ -19,6 +19,7 @@
     bigPictureNode.querySelector('.big-picture__img img').setAttribute('src', post.url);
     bigPictureNode.querySelector('.likes-count').textContent = post.likes;
     bigPictureNode.querySelector('.social__caption').textContent = post.description;
+    bigPictureNode.querySelector('.comments-count').textContent = post.comments.length;
 
     // Закрытие попапа
     bigPictureNode.addEventListener('keydown', function (evt) {
@@ -36,17 +37,44 @@
       bigPictureNode.remove();
     });
 
-    // Вызов отрисовывающе-добавляющей функии
-    var elements = window.createComments(post);
 
-    var commentsList = document.querySelector('.social__comments');
-    commentsList.appendChild(elements);
+    var commentsList = bigPictureNode.querySelector('.social__comments');
+    var commentsLoaderButton = bigPictureNode.querySelector('.social__comments-loader');
+    // спрятать кнопку, если меньше или пять комментариев
+    if (post.comments.length <= window.utils.COMMENTS_AMOUNT) {
+      commentsLoaderButton.classList.add('visually-hidden');
+      bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
+    }
 
-    var commentCount = bigPictureNode.querySelector('.social__comment-count');
-    var commentLoader = bigPictureNode.querySelector('.comments-loader');
+    //  копирование изначального массива
+    var comments = post.comments.slice();
+    // первые 5 комментариев
+    commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
 
-    commentCount.classList.add('visually-hidden');
-    commentLoader.classList.add('visually-hidden');
+    // функция отрисовки комментариев
+    var addNextComments = function () {
+
+      comments.splice(0, window.utils.COMMENTS_AMOUNT);
+
+      if (comments.length <= window.utils.COMMENTS_AMOUNT) {
+        commentsList.appendChild(window.createCommentsElements(comments, comments.length));
+        commentsLoaderButton.classList.add('visually-hidden');
+        return;
+      }
+
+      commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
+    };
+
+    commentsLoaderButton.addEventListener('click', function (evt) {
+      evt.preventDefault();
+
+      addNextComments();
+
+      var visibleComments = commentsList.querySelectorAll('.social__comment');
+      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + post.comments.length + ' комментариев';
+
+    });
+
   };
 
   window.createBigPicture = createBigPicture;

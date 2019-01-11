@@ -43,6 +43,11 @@
 
   };
 
+  window.scale = {
+    defaultValue: SCALE_VALUE,
+    percentValue: SCALE_PERCENT_FOR_VALUE
+  };
+
   window.scaleImage = scaleImage;
 
 })();

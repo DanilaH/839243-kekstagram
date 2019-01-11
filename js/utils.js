@@ -35,6 +35,7 @@
     MAX_COMMENTS_LENGTH: 10,
     TOTAL_OBJECTS: 25,
     ESC_KEYCODE: 27,
+    COMMENTS_AMOUNT: 5,
     getRandomFromArray: getRandomFromArray,
     getKindOfRandomFromArray: getKindOfRandomFromArray,
     getRandomNumber: getRandomNumber
