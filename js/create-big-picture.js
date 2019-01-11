@@ -46,35 +46,31 @@
       bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
     }
 
+    //  копирование изначального массива
+    var comments = post.comments.slice();
+    // первые 5 комментариев
+    commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
+
     // функция отрисовки комментариев
-    var minValue = 0;
-    var maxvalue = 5;
+    var addNextComments = function () {
 
-    var addComments = function () {
+      comments.splice(0, window.utils.COMMENTS_AMOUNT);
 
-      var comments = post.comments.slice(minValue, maxvalue);
-
-      commentsList.appendChild(window.createCommentsElements(comments, comments.length));
-
-      if (maxvalue >= post.comments.length) {
+      if (comments.length <= window.utils.COMMENTS_AMOUNT) {
+        commentsList.appendChild(window.createCommentsElements(comments, comments.length));
         commentsLoaderButton.classList.add('visually-hidden');
+        return;
       }
 
-      minValue += window.utils.COMMENTS_AMOUNT;
-      maxvalue += window.utils.COMMENTS_AMOUNT;
-
+      commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
     };
-
-    // первые 5 комментариев
-    addComments();
 
     commentsLoaderButton.addEventListener('click', function (evt) {
       evt.preventDefault();
 
-      addComments();
+      addNextComments();
 
       var visibleComments = commentsList.querySelectorAll('.social__comment');
-
       bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + post.comments.length + ' комментариев';
 
     });
