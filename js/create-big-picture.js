@@ -47,17 +47,20 @@
     }
 
     // функция отрисовкb комментариев
-    var comments = post.comments.slice();
+
+    // схранить количество коментариев
+    var commentsValue = post.comments.length;
+
     var addComments = function () {
 
-      if (comments.length < window.utils.COMMENTS_AMOUNT) {
-        commentsList.appendChild(window.createCommentsElements(post, comments.length));
+      if (post.comments.length < window.utils.COMMENTS_AMOUNT) {
+        commentsList.appendChild(window.createCommentsElements(post, post.comments.length));
         commentsLoaderButton.classList.add('visually-hidden');
         return;
       }
 
       commentsList.appendChild(window.createCommentsElements(post, window.utils.COMMENTS_AMOUNT));
-      comments.splice(0, window.utils.COMMENTS_AMOUNT);
+      post.comments.splice(0, window.utils.COMMENTS_AMOUNT);
     };
 
     // первые 5 комментариев
@@ -70,7 +73,7 @@
 
       var visibleComments = commentsList.querySelectorAll('.social__comment');
 
-      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + post.comments.length + ' комментариев';
+      bigPictureNode.querySelector('.social__comment-count').textContent = visibleComments.length + ' из ' + commentsValue + ' комментариев';
 
     });
 
