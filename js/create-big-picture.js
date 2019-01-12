@@ -28,7 +28,7 @@
       bigPictureNode.remove();
 
       document.removeEventListener('keydown', onEscPress);
-    }
+    };
 
     var onEscPress = function (evt) {
       if (evt.keyCode === window.utils.ESC_KEYCODE) {

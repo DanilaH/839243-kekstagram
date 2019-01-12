@@ -161,7 +161,7 @@
 
           if (totalHashtags[j] === totalHashtags[m]) {
             hashtagInput.setCustomValidity('Не должно быть повторяющихся хэштэгов');
-            hashtagInput.style = "border: 2px solid #FF4D4D";
+            hashtagInput.style = 'border: 2px solid #FF4D4D';
             return;
           }
 
@@ -172,24 +172,24 @@
       for (var i = 0; i < totalHashtags.length; i++) {
         if (totalHashtags[i] === '') {
           hashtagInput.setCustomValidity('');
-          hashtagInput.style = "border: none";
+          hashtagInput.style = 'border: none';
         } else if (totalHashtags[i] === '#') {
           hashtagInput.setCustomValidity('Хэштэг не может состоять из одной решётки');
-          hashtagInput.style = "border: 2px solid #FF4D4D";
+          hashtagInput.style = 'border: 2px solid #FF4D4D';
           return;
         } else if (totalHashtags[i].length >= HASHTAG_LENGTH) {
           hashtagInput.setCustomValidity('Хэштэг не может состоять больше, чем из 20 символов');
-          hashtagInput.style = "border: 2px solid #FF4D4D";
+          hashtagInput.style = 'border: 2px solid #FF4D4D';
           return;
         } else if (totalHashtags[i].charAt(0) !== '#') {
           hashtagInput.setCustomValidity('Хэштэг должен начинаться с решётки');
-          hashtagInput.style = "border: 2px solid #FF4D4D";
+          hashtagInput.style = 'border: 2px solid #FF4D4D';
           return;
         }
       }
 
       hashtagInput.setCustomValidity('');
-      hashtagInput.style = "border: none";
+      hashtagInput.style = 'border: none';
     });
 
 
