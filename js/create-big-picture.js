@@ -45,16 +45,19 @@
     // про комментарии
     var commentsList = bigPictureNode.querySelector('.social__comments');
     var commentsLoaderButton = bigPictureNode.querySelector('.social__comments-loader');
+
+    //  копирование изначального массива
+    var comments = post.comments.slice();
+
     // спрятать кнопку, если меньше или пять комментариев
     if (post.comments.length <= window.utils.COMMENTS_AMOUNT) {
       commentsLoaderButton.classList.add('visually-hidden');
       bigPictureNode.querySelector('.social__comment-count').textContent = post.comments.length + ' из ' + post.comments.length + ' комментариев';
+      commentsList.appendChild(window.createCommentsElements(comments, post.comments.length));
+    } else if (post.comments.length > window.utils.COMMENTS_AMOUNT) {
+      // если больше 5 комментариев
+      commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
     }
-
-    //  копирование изначального массива
-    var comments = post.comments.slice();
-    // первые 5 комментариев
-    commentsList.appendChild(window.createCommentsElements(comments, window.utils.COMMENTS_AMOUNT));
 
     // функция отрисовки комментариев
     var addNextComments = function () {
