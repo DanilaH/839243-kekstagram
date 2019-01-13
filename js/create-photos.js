@@ -94,9 +94,10 @@
 
     });
 
-    for (var i = 0; i < similarPostsArray.length; i++) {
-      fragment.appendChild(createPostElement(similarPostsArray[i], similarPhotoTemplate));
-    }
+    similarPostsArray.forEach(function (element) {
+      fragment.appendChild(createPostElement(element, similarPhotoTemplate));
+    });
+
 
     deletePictureElements(discussedPosts);
     pictures.appendChild(fragment);

@@ -15,9 +15,9 @@
     var commentaries = [];
     commentaries.length = window.utils.getRandomNumber(window.utils.MIN_COMMENTS_LENGTH, window.utils.MAX_COMMENTS_LENGTH);
 
-    for (var i = 0; i < commentaries.length; i++) {
-      commentaries[i] = createComment();
-    }
+    commentaries.forEach(function (element) {
+      element = createComment();
+    });
 
     return commentaries;
   };
@@ -36,9 +36,9 @@
     var posts = [];
     posts.length = window.utils.TOTAL_OBJECTS;
 
-    for (var i = 0; i < posts.length; i++) {
-      posts[i] = createPost();
-    }
+    posts.forEach(function (element) {
+      element = createPost();
+    });
 
     return posts;
   };
