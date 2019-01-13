@@ -50,9 +50,9 @@
 
     filters.classList.remove('img-filters--inactive');
 
-    for (var i = 0; i < postsArray.length; i++) {
-      fragment.appendChild(createPostElement(postsArray[i], similarPhotoTemplate));
-    }
+    postsArray.forEach(function (element) {
+      fragment.appendChild(createPostElement(element, similarPhotoTemplate));
+    });
 
     deletePictureElements(popularPosts);
     pictures.appendChild(fragment);
@@ -69,9 +69,9 @@
       array[j] = window.utils.getKindOfRandomFromArray(similarPostsArray);
     }
 
-    for (var i = 0; i < array.length; i++) {
-      fragment.appendChild(createPostElement(array[i], similarPhotoTemplate));
-    }
+    similarPostsArray.forEach(function (element) {
+      fragment.appendChild(createPostElement(element, similarPhotoTemplate));
+    });
 
     deletePictureElements(newPosts);
     pictures.appendChild(fragment);
